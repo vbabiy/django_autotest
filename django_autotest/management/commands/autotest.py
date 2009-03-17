@@ -15,7 +15,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kargs):
         from django.utils import autoreload
-        autoreload.main(self.test, args, kargs)
+        try:
+            autoreload.main(self.test, args, kargs)
+        except KeyboardInterrupt, e:
+            print e
     
     def test( self, *test_labels, **options):
         from django.conf import settings
@@ -32,7 +35,7 @@ class Command(BaseCommand):
         test_module = __import__(test_module_name, {}, {}, test_path[-1])
         test_runner = getattr(test_module, test_path[-1])
         
-        failures = test_runner(test_labels, verbosity=verbosity, interactive=True)
+        failures = test_runner(test_labels, verbosity=verbosity, interactive=interactive)
         self.alert(failures)
             
     def alert(self, failures):
